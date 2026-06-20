@@ -1,0 +1,16 @@
+{
+  "name": "code-review-checklist",
+  "description": "변경된 코드를 받아 버그·가독성·테스트·보안 관점의 코드 리뷰 체크리스트를 생성하는 스킬. PR 리뷰 전 자가 점검용.",
+  "version": "0.1.0",
+  "author": {
+    "name": "jteamjang"
+  },
+  "license": "MIT",
+  "keywords": [
+    "code-review",
+    "checklist",
+    "pull-request",
+    "claude-code-plugin",
+    "quality"
+  ]
+}

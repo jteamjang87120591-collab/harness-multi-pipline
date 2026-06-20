@@ -1,0 +1,17 @@
+{
+  "name": "code-review-team",
+  "description": "보안·성능·테스트 전문 리뷰어 에이전트 팀이 변경된 코드를 병렬로 감사하고, 교차 토론 후 하나의 통합 리뷰 리포트를 생성하는 멀티 에이전트 하네스. PR 머지 전 종합 리뷰용.",
+  "version": "0.1.0",
+  "author": {
+    "name": "jteamjang"
+  },
+  "license": "MIT",
+  "keywords": [
+    "code-review",
+    "agent-team",
+    "fan-out-fan-in",
+    "security",
+    "performance",
+    "claude-code-plugin"
+  ]
+}

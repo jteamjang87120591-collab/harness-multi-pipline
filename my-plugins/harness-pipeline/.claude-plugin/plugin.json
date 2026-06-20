@@ -1,0 +1,22 @@
+{
+  "name": "harness-pipeline",
+  "description": "여러 에이전트 팀을 순차로 구성하고(세션당 1팀 제약 하에서 TeamDelete→TeamCreate 핸드오프) 팀 간 산출물/입력물을 명시적 '계약(artifact contract)'으로 연결하며, MCP 외부 툴(예: Figma)을 에이전트에 선언·연동하도록 설계하는 메타 스킬. harness가 한 팀을 만든다면 harness-pipeline은 여러 팀을 잇는다.",
+  "version": "0.1.0",
+  "author": {
+    "name": "jteamjang"
+  },
+  "license": "MIT",
+  "keywords": [
+    "harness",
+    "harness-pipeline",
+    "multi-team",
+    "pipeline",
+    "artifact-contract",
+    "team-handoff",
+    "mcp",
+    "orchestration",
+    "agent-team",
+    "claude-code-plugin",
+    "meta-skill"
+  ]
+}

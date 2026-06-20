@@ -1,0 +1,15 @@
+{
+  "name": "harness-pipeline-marketplace",
+  "owner": {
+    "name": "jteamjang",
+    "url": "https://github.com/jteamjang/harness-pipeline"
+  },
+  "plugins": [
+    {
+      "name": "harness-pipeline",
+      "source": "./",
+      "description": "여러 에이전트 팀을 순차로 잇는 팀 레벨 파이프라인 메타 스킬. 팀 간 산출물/입력물 계약 + MCP 외부 툴 연동. harness 선행 설치 필요.",
+      "version": "0.1.0"
+    }
+  ]
+}
