@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>harness-pipeline 쉬운 매뉴얼</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#1a1d27; --panel2:#222634; --ink:#e8eaf0; --muted:#9aa1b5;
+    --brand:#6c8cff; --brand2:#46d3a8; --warn:#ffb454; --danger:#ff6b81; --line:#2c3140;
+    --code:#11141c;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,sans-serif;
+    line-height:1.75; font-size:16px;
+  }
+  .wrap{max-width:920px; margin:0 auto; padding:0 20px 120px}
+  header.hero{
+    text-align:center; padding:70px 20px 50px;
+    background:radial-gradient(1200px 400px at 50% -10%, rgba(108,140,255,.25), transparent);
+    border-bottom:1px solid var(--line);
+  }
+  .hero h1{font-size:2.4rem; margin:0 0 10px; letter-spacing:-1px}
+  .hero .tag{color:var(--brand2); font-weight:700; font-size:1.05rem}
+  .hero p{color:var(--muted); max-width:620px; margin:14px auto 0}
+  .badge{display:inline-block; background:var(--panel2); border:1px solid var(--line);
+    color:var(--muted); font-size:.8rem; padding:4px 12px; border-radius:999px; margin-top:18px}
+
+  nav.toc{
+    background:var(--panel); border:1px solid var(--line); border-radius:16px;
+    padding:22px 26px; margin:38px 0;
+  }
+  nav.toc h2{margin:0 0 12px; font-size:1rem; color:var(--muted); letter-spacing:1px}
+  nav.toc ol{margin:0; padding-left:20px; columns:2; column-gap:30px}
+  nav.toc a{color:var(--ink); text-decoration:none}
+  nav.toc a:hover{color:var(--brand)}
+
+  section{margin:54px 0; scroll-margin-top:20px}
+  h2.sec{font-size:1.65rem; margin:0 0 6px; display:flex; align-items:center; gap:12px}
+  h2.sec .n{
+    flex:none; width:38px; height:38px; border-radius:11px; display:grid; place-items:center;
+    background:linear-gradient(140deg,var(--brand),#8a6cff); color:#fff; font-size:1.05rem; font-weight:800;
+  }
+  h3{font-size:1.2rem; margin:30px 0 8px; color:#fff}
+  p{margin:10px 0}
+  .lead{color:var(--muted)}
+
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px 22px; margin:16px 0}
+  .analogy{
+    background:linear-gradient(180deg, rgba(70,211,168,.10), rgba(70,211,168,.02));
+    border:1px solid rgba(70,211,168,.35); border-radius:14px; padding:16px 20px; margin:16px 0;
+  }
+  .analogy b{color:var(--brand2)}
+  .analogy::before{content:"🧩 비유로 이해하기"; display:block; color:var(--brand2); font-weight:800; font-size:.85rem; margin-bottom:6px; letter-spacing:.5px}
+
+  .note{border-left:4px solid var(--brand); background:var(--panel2); padding:12px 16px; border-radius:0 10px 10px 0; margin:16px 0}
+  .warn{border-left:4px solid var(--warn); background:rgba(255,180,84,.08); padding:12px 16px; border-radius:0 10px 10px 0; margin:16px 0}
+  .warn::before{content:"⚠️ 주의 "; font-weight:800; color:var(--warn)}
+  .danger{border-left:4px solid var(--danger); background:rgba(255,107,129,.08); padding:12px 16px; border-radius:0 10px 10px 0; margin:16px 0}
+
+  code{background:var(--code); border:1px solid var(--line); padding:2px 7px; border-radius:6px; font-size:.9em; color:#cfe0ff}
+  pre{background:var(--code); border:1px solid var(--line); border-radius:12px; padding:16px 18px; overflow:auto; margin:14px 0}
+  pre code{background:none; border:none; padding:0; color:#d7def0; line-height:1.6}
+
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:.95rem; overflow:hidden; border-radius:12px}
+  th,td{border:1px solid var(--line); padding:10px 12px; text-align:left; vertical-align:top}
+  th{background:var(--panel2); color:#fff}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+
+  .pipeline{display:flex; align-items:stretch; gap:0; flex-wrap:wrap; margin:18px 0}
+  .stage{flex:1; min-width:150px; background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:14px; text-align:center}
+  .stage .t{font-weight:800; color:#fff}
+  .stage .d{color:var(--muted); font-size:.85rem; margin-top:4px}
+  .arrow{display:grid; place-items:center; padding:0 6px; color:var(--brand); font-size:1.6rem; font-weight:800}
+  .arrow small{display:block; font-size:.62rem; color:var(--muted); font-weight:600}
+
+  .steps{counter-reset:step; list-style:none; padding:0; margin:16px 0}
+  .steps li{position:relative; padding:12px 16px 12px 56px; background:var(--panel); border:1px solid var(--line); border-radius:12px; margin:10px 0}
+  .steps li::before{counter-increment:step; content:counter(step); position:absolute; left:14px; top:12px;
+    width:28px; height:28px; border-radius:8px; background:var(--brand); color:#fff; font-weight:800; display:grid; place-items:center; font-size:.9rem}
+
+  .pill{display:inline-block; padding:2px 10px; border-radius:999px; font-size:.78rem; font-weight:700; margin-right:6px}
+  .pill.ok{background:rgba(70,211,168,.15); color:var(--brand2); border:1px solid rgba(70,211,168,.4)}
+  .pill.no{background:rgba(255,107,129,.13); color:var(--danger); border:1px solid rgba(255,107,129,.4)}
+
+  details{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:4px 18px; margin:10px 0}
+  details summary{cursor:pointer; font-weight:700; padding:12px 0; color:#fff}
+  details[open] summary{border-bottom:1px solid var(--line); margin-bottom:10px}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  @media(max-width:680px){ .grid2{grid-template-columns:1fr} nav.toc ol{columns:1} }
+
+  footer{color:var(--muted); text-align:center; border-top:1px solid var(--line); padding-top:24px; font-size:.85rem}
+  .kbd{font-size:.85em; color:var(--brand2)}
+  hr{border:none; border-top:1px solid var(--line); margin:30px 0}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="tag">Claude Code 플러그인</div>
+  <h1>harness-pipeline 쉬운 매뉴얼</h1>
+  <p>전문 용어 없이, 비유로 이해하는 "여러 AI 팀을 순서대로 잇는 작업 파이프라인" 사용 설명서</p>
+  <div class="badge">버전 0.1.0 · 비전문가용 · 한국어</div>
+</header>
+
+<div class="wrap">
+
+<nav class="toc">
+  <h2>목차</h2>
+  <ol>
+    <li><a href="#what">이게 도대체 뭔가요?</a></li>
+    <li><a href="#words">5분 만에 끝내는 핵심 용어</a></li>
+    <li><a href="#vs">harness vs harness-pipeline</a></li>
+    <li><a href="#how">어떻게 동작하나요?</a></li>
+    <li><a href="#install">설치하기 (준비물)</a></li>
+    <li><a href="#use">사용하기 (말만 걸면 됩니다)</a></li>
+    <li><a href="#example">실제 예시 — 디자인에서 코드까지</a></li>
+    <li><a href="#rules">꼭 지켜지는 안전 규칙</a></li>
+    <li><a href="#faq">자주 묻는 질문</a></li>
+    <li><a href="#glossary">용어 사전</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="what">
+  <h2 class="sec"><span class="n">1</span> 이게 도대체 뭔가요?</h2>
+  <p class="lead"><b>harness-pipeline</b>은 여러 개의 "AI 작업 팀"을 <b>정해진 순서대로</b> 이어 붙여, 하나의 큰 일을 처음부터 끝까지 자동으로 끝내게 해주는 도구입니다.</p>
+
+  <div class="analogy">
+    <b>공장 컨베이어 벨트</b>를 떠올려 보세요.<br>
+    자동차 공장에서는 한 사람이 차 한 대를 통째로 만들지 않습니다.
+    ① <b>설계 팀</b>이 도면을 그리고 → ② <b>조립 팀</b>이 도면을 받아 차체를 만들고 → ③ <b>검수 팀</b>이 완성차를 점검합니다.
+    각 팀은 <b>앞 팀의 결과물</b>을 받아서 자기 일을 하고, 다음 팀에게 넘깁니다.<br><br>
+    harness-pipeline이 하는 일이 바로 이겁니다. 다만 "팀원"이 사람이 아니라 <b>AI(Claude)</b>일 뿐이죠.
+  </div>
+
+  <div class="pipeline">
+    <div class="stage"><div class="t">① 리서치 팀</div><div class="d">자료를 조사한다</div></div>
+    <div class="arrow">→<small>결과 전달</small></div>
+    <div class="stage"><div class="t">② 디자인 팀</div><div class="d">조사결과로 설계한다</div></div>
+    <div class="arrow">→<small>결과 전달</small></div>
+    <div class="stage"><div class="t">③ 빌드 팀</div><div class="d">설계대로 만든다</div></div>
+  </div>
+
+  <div class="note"><b>한 줄 요약:</b> "혼자 다 하기엔 너무 큰 일"을 <b>여러 전문 팀으로 쪼개서 차례차례 바통을 넘기며</b> 끝내는 자동화 도구입니다.</div>
+
+  <h3>그럼 이건 "프로그램"인가요?</h3>
+  <p>아니요. 정확히는 <b>Claude에게 "이렇게 일하라"고 가르치는 설명서(스킬)</b>입니다. 버튼을 누르면 실행되는 앱이 아니라, 여러분이 Claude에게 부탁하면 Claude가 이 설명서를 펼쳐 보고 그 방식대로 팀을 꾸려 일하는 구조예요. 그래서 "메타 스킬"(스킬을 만드는 스킬)이라고 부릅니다.</p>
+</section>
+
+<!-- 2 -->
+<section id="words">
+  <h2 class="sec"><span class="n">2</span> 5분 만에 끝내는 핵심 용어</h2>
+  <p class="lead">딱 5개만 알면 나머지가 다 이해됩니다.</p>
+
+  <div class="card">
+    <h3 style="margin-top:6px">① 에이전트 (Agent)</h3>
+    <p>일하는 <b>AI 한 명</b>. "조사 담당", "코드 작성 담당"처럼 한 가지 역할을 맡습니다.</p>
+    <div class="analogy"><b>직원 한 명.</b> 회사로 치면 신입사원 하나하나입니다.</div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:6px">② 팀 (Team) = 스테이지 (Stage)</h3>
+    <p>같은 목표를 가진 에이전트 <b>여러 명의 묶음</b>. harness-pipeline에서는 <b>"팀 1개 = 작업 단계(스테이지) 1개"</b>로 봅니다.</p>
+    <div class="analogy"><b>부서 하나.</b> "디자인 팀", "개발 팀"처럼요. 컨베이어 벨트의 한 칸이라고 보면 됩니다.</div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:6px">③ 계약 (Contract) — <span style="color:var(--brand2)">가장 중요!</span></h3>
+    <p>앞 팀이 <b>"이런 모양으로 결과를 주겠다"</b>고, 뒤 팀이 <b>"이런 모양으로 받겠다"</b>고 미리 정해두는 약속 문서입니다.</p>
+    <div class="analogy">
+      <b>식당 주문서.</b> 손님(뒤 팀)이 "아메리카노, 샷 추가, 얼음 적게"라고 적으면, 바리스타(앞 팀)는 정확히 그대로 만들어 줍니다.
+      주문서가 없으면? 손님은 차를 시켰는데 커피가 나오는 사고가 납니다. <b>계약은 팀끼리의 주문서</b>예요.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:6px">④ 핸드오프 (Handoff)</h3>
+    <p>한 팀이 일을 끝내고 <b>결과물을 다음 팀에게 넘기는 행위</b>.</p>
+    <div class="analogy"><b>릴레이 경주의 바통 터치.</b> 바통(결과 파일)을 떨어뜨리면 경주가 끝나버리므로, 넘기는 순간이 가장 중요합니다.</div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:6px">⑤ MCP (외부 도구 연결)</h3>
+    <p>Claude가 <b>Figma, GitHub, 데이터베이스 같은 바깥 프로그램</b>을 직접 다룰 수 있게 해주는 연결 통로입니다. (선택 기능)</p>
+    <div class="analogy"><b>콘센트(멀티탭).</b> AI라는 본체에 "Figma 플러그", "GitHub 플러그"를 꽂아 외부 도구의 전기를 끌어 씁니다.</div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="vs">
+  <h2 class="sec"><span class="n">3</span> harness vs harness-pipeline</h2>
+  <p class="lead">이름이 비슷한 두 도구가 있습니다. 헷갈리지 않게 한 번에 정리할게요.</p>
+
+  <table>
+    <tr><th></th><th>harness</th><th>harness-pipeline (이 도구)</th></tr>
+    <tr><td><b>역할</b></td><td>팀 <b>한 개</b>를 잘 만든다</td><td>여러 팀을 <b>순서대로 잇는다</b></td></tr>
+    <tr><td><b>비유</b></td><td>부서 하나를 꾸리는 팀장</td><td>여러 부서를 줄 세우는 공장장</td></tr>
+    <tr><td><b>언제 쓰나</b></td><td>한 팀으로 끝나는 일</td><td>전문성이 완전히 다른 팀이 여럿 필요한 일</td></tr>
+  </table>
+
+  <div class="note">
+    <b>관계:</b> harness-pipeline의 <b>한 칸(스테이지)을 만들 때 harness를 한 번씩 사용</b >합니다. 즉 harness-pipeline은 harness를 부품처럼 가져다 씁니다. <b>그래서 harness가 먼저 설치돼 있어야 합니다.</b>
+  </div>
+
+  <div class="warn">단일 팀으로 충분한 작은 일이라면 굳이 harness-pipeline을 쓰지 마세요. 팀을 여러 개 만드는 건 그만큼 시간과 비용이 더 듭니다. <b>"전문 분야가 확연히 다른 단계가 2~4개"</b>일 때가 딱 맞습니다.</div>
+</section>
+
+<!-- 4 -->
+<section id="how">
+  <h2 class="sec"><span class="n">4</span> 어떻게 동작하나요?</h2>
+  <p class="lead">Claude가 내부적으로 밟는 순서입니다. 여러분이 외울 필요는 없지만, 알아두면 "지금 뭘 하는 중인지" 보입니다.</p>
+
+  <ol class="steps">
+    <li><b>현황 확인</b> — 이전에 하던 작업이 있는지 먼저 살핍니다. 있으면 <b>끊긴 데서 이어서</b> 합니다.</li>
+    <li><b>단계 나누기</b> — 큰 일을 팀 단위 단계(스테이지)로 쪼갭니다. 보통 2~4개.</li>
+    <li><b>계약 먼저 작성</b> — 팀을 만들기 <b>전에</b> 팀 사이의 "주문서(계약)"부터 정합니다.</li>
+    <li><b>한 팀씩 일 시키기</b> — 첫 팀을 만들어 일을 끝내고, <b>정리한 뒤</b> 다음 팀을 만듭니다.</li>
+    <li><b>경계에서 검사(게이트)</b> — 팀이 넘기는 결과가 계약(주문서)대로인지 확인합니다. 어긋나면 막습니다.</li>
+    <li><b>최종 결과 전달 + 기록</b> — 마지막 결과물을 여러분에게 주고, 작업 이력을 남깁니다.</li>
+  </ol>
+
+  <div class="analogy">
+    핵심은 <b>"한 작업대에서 한 팀만 일한다"</b>는 점입니다. 작업대가 하나뿐이라, 다음 팀이 오려면 <b>먼저 온 팀이 자리를 비워줘야</b> 합니다(이걸 <code>TeamDelete</code>라고 합니다). 그래서 "동시에 여러 팀"이 아니라 <b>"차례차례 한 팀씩"</b> 입니다.
+  </div>
+
+  <h3>왜 데이터를 꼭 "파일"로 넘기나요?</h3>
+  <p>팀끼리는 직접 대화(메신저)를 할 수 없습니다. 각 팀은 서로 다른 방에서 일하기 때문이에요. 그래서 결과를 <b>파일로 적어서 공용 사물함(<code>_workspace</code> 폴더)에 넣어두면</b>, 다음 팀이 그 파일을 꺼내 읽습니다. 이게 유일하고 확실한 전달 방법입니다.</p>
+</section>
+
+<!-- 5 -->
+<section id="install">
+  <h2 class="sec"><span class="n">5</span> 설치하기 (준비물)</h2>
+  <p class="lead">시작 전에 3가지가 필요합니다.</p>
+
+  <ol class="steps">
+    <li><b>harness 플러그인 먼저 설치</b> — 이게 없으면 harness-pipeline은 동작하지 않습니다. (각 단계를 harness로 만들기 때문)</li>
+    <li><b>에이전트 팀 기능 켜기</b> — 아래 명령으로 실험 기능을 활성화합니다.</li>
+    <li><b>(선택) 외부 도구 쓸 거면</b> — Figma·GitHub 같은 MCP 서버를 설정 파일에 등록합니다.</li>
+  </ol>
+
+  <h3>플러그인 설치</h3>
+<pre><code>claude plugin marketplace add jteamjang87120591-collab/harness-multi-pipline
+claude plugin install harness-pipeline@harness-pipeline-marketplace</code></pre>
+
+  <h3>에이전트 팀 기능 켜기</h3>
+  <p><b>Windows (PowerShell)</b> — 지금 쓰시는 환경입니다:</p>
+<pre><code>$env:CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1"</code></pre>
+  <p><b>macOS / Linux</b>:</p>
+<pre><code>export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</code></pre>
+
+  <div class="warn">위 명령은 <b>그 터미널 창에서만</b> 적용됩니다. 매번 켜기 귀찮다면 Windows는 PowerShell 프로필(<code>$PROFILE</code>)이나 시스템 환경 변수에, macOS/Linux는 <code>~/.zshrc</code>·<code>~/.bashrc</code>에 추가해 영구 적용하세요.</div>
+
+  <div class="danger"><b>실험적 기능 안내:</b> 이 플러그인은 아직 실험 단계인 "에이전트 팀" 기능에 기댑니다. Claude Code 버전·환경에 따라 동작이 달라질 수 있으니, 팀에 본격 도입하기 전에 <b>한 명이 먼저 테스트</b>해 보길 권합니다.</div>
+</section>
+
+<!-- 6 -->
+<section id="use">
+  <h2 class="sec"><span class="n">6</span> 사용하기 (말만 걸면 됩니다)</h2>
+  <p class="lead">복잡한 명령어는 없습니다. Claude에게 <b>평소 말하듯 부탁</b>하면, Claude가 알아서 이 스킬을 펼칩니다.</p>
+
+  <h3>이렇게 말하면 켜집니다</h3>
+  <div class="card">
+    <p>💬 "다중 팀 파이프라인 설계해줘 — 리서치 → 디자인 → 빌드를 팀마다 넘기는 흐름"</p>
+    <p>💬 "Figma 디자인을 받아 스펙 추출하고 코드까지 만드는 파이프라인 하네스 구성해줘"</p>
+    <p>💬 "스테이지로 나눠서 팀마다 작업 넘겨줘"</p>
+  </div>
+
+  <h3>나중에 이어서 부탁할 때도 같은 스킬을 씁니다</h3>
+  <p>한 번 만든 파이프라인은 다음과 같이 이어서 다룰 수 있습니다:</p>
+  <ul>
+    <li>"파이프라인 다시 실행해줘"</li>
+    <li>"2번 디자인 단계만 다시 해줘"</li>
+    <li>"계약을 이렇게 바꿔줘 / 단계를 하나 더 추가해줘"</li>
+  </ul>
+  <div class="note">중간에 멈췄어도 걱정 없습니다. Claude가 <b>작업 기록(handoff_log)</b>을 보고 <b>끊긴 단계부터 이어서</b> 진행합니다.</div>
+
+  <h3>이럴 땐 쓰지 마세요</h3>
+  <p><span class="pill no">아님</span> 한 팀이면 충분한 작은 일 → <b>harness</b>를 쓰세요.<br>
+  <span class="pill no">아님</span> "이 코드 설명해줘", "이거 실행해줘" 같은 단순 요청 → 그냥 일반 대화로 충분합니다.</p>
+</section>
+
+<!-- 7 -->
+<section id="example">
+  <h2 class="sec"><span class="n">7</span> 실제 예시 — 디자인에서 코드까지</h2>
+  <p class="lead">"Figma 디자인을 받아 → 조사하고 → 설계 스펙을 뽑고 → 화면 코드까지 만드는" 3단계 파이프라인을 따라가 봅니다.</p>
+
+  <table>
+    <tr><th>단계</th><th>팀</th><th>하는 일</th><th>넘기는 결과물</th><th>외부도구</th></tr>
+    <tr><td>① 리서치</td><td>조사 3명</td><td>사용자 불편(페인포인트) 조사</td><td><code>findings.json</code></td><td>—</td></tr>
+    <tr><td>② 디자인</td><td>추출·작성 2명</td><td>Figma에서 디자인 값 뽑아 설계서 작성</td><td><code>design_spec.json</code></td><td>✅ Figma</td></tr>
+    <tr><td>③ 빌드</td><td>개발·검수 2명</td><td>설계서대로 화면 코드 제작</td><td><code>src/</code> 코드</td><td>—</td></tr>
+  </table>
+
+  <div class="pipeline">
+    <div class="stage"><div class="t">① 리서치</div><div class="d">findings.json</div></div>
+    <div class="arrow">→<small>계약1</small></div>
+    <div class="stage"><div class="t">② 디자인</div><div class="d">design_spec.json</div></div>
+    <div class="arrow">→<small>계약2</small></div>
+    <div class="stage"><div class="t">③ 빌드</div><div class="d">완성 코드</div></div>
+  </div>
+
+  <p>각 화살표 위의 <b>"계약"</b>이 바로 팀 사이의 주문서입니다. 예를 들어 ①→② 계약에는 "리서치 팀은 <code>topic</code>(주제)과 <code>pain_points</code>(불편 목록)를 꼭 담아 준다"고 적혀 있습니다. 디자인 팀은 그걸 믿고 받아 일을 시작하죠.</p>
+
+  <div class="warn"><b>안전장치가 동작하는 순간:</b> 만약 ② 디자인 단계에서 Figma 연결이 실패해 디자인 값(layout_tokens)이 비어버리면, ②→③ 검사(게이트)에서 <b>걸러내고 멈춥니다.</b> 망가진 설계서를 ③ 빌드 팀에 넘겨 엉뚱한 코드를 만드는 사고를 막는 거죠. (가짜 값으로 대충 채우고 진행하지 않습니다.)</div>
+
+  <details>
+    <summary>📄 계약 파일이 실제로 어떻게 생겼는지 보기 (호기심 있는 분만)</summary>
+    <p>계약은 위쪽 "기계가 읽는 부분"과 아래쪽 "사람이 읽는 부분"으로 나뉩니다.</p>
+<pre><code>---
+contract_id: 01-research__to__02-design
+version: 1.0.0
+produces:
+  - path: _workspace/stage01_research/findings.json
+    format: json
+consumes:
+  - path: _workspace/stage01_research/findings.json
+    required: true
+---
+# 계약: 01-research → 02-design (v1.0.0)
+
+## 출력 스키마 (앞 팀이 보장)
+| 필드        | 타입          | 필수 | 설명             |
+|------------|---------------|:---:|------------------|
+| topic      | string        | ✅  | 조사 주제        |
+| pain_points| array&lt;string&gt; | ✅  | 불편 목록(중요도순)|
+
+## 의미 계약
+- pain_points 는 비어 있으면 안 됨 (최소 1개), 중요도 내림차순.</code></pre>
+    <p class="lead" style="font-size:.9rem">→ "주문서에 무엇을, 어떤 모양으로, 어떤 의미로 담을지"를 사람도 AI도 읽을 수 있게 적어둔 것입니다.</p>
+  </details>
+</section>
+
+<!-- 8 -->
+<section id="rules">
+  <h2 class="sec"><span class="n">8</span> 꼭 지켜지는 안전 규칙</h2>
+  <p class="lead">Claude가 항상 지키도록 설계된 규칙들입니다. 알아두면 결과를 신뢰할 수 있습니다.</p>
+
+  <div class="grid2">
+    <div class="card"><h3 style="margin-top:4px">🔁 한 번에 한 팀만</h3><p>작업대가 하나라, 다음 팀을 만들기 전에 반드시 이전 팀을 정리합니다. 그래서 "순서대로" 진행됩니다.</p></div>
+    <div class="card"><h3 style="margin-top:4px">📁 전달은 오직 파일로</h3><p>팀끼리 직접 대화하지 않고, 공용 폴더의 파일로만 결과를 주고받습니다. 흐름이 또렷해집니다.</p></div>
+    <div class="card"><h3 style="margin-top:4px">🚦 경계마다 검사</h3><p>결과가 계약(주문서)대로인지 확인하고, 어긋나면 다음 팀으로 못 넘기게 막습니다.</p></div>
+    <div class="card"><h3 style="margin-top:4px">🛑 망가진 건 전파 금지</h3><p>한 번 고쳐 보고도 안 되면 멈추고 보고합니다. 잘못된 결과를 끝까지 끌고 가지 않습니다.</p></div>
+  </div>
+
+  <div class="note"><b>왜 이렇게까지?</b> 파이프라인에서 가장 위험한 건 <b>"앞 단계의 작은 오류가 뒤로 갈수록 눈덩이처럼 커지는 것"</b>입니다. 그래서 오류는 <b>생긴 자리에서 바로</b> 막는 게 가장 쌉니다.</div>
+</section>
+
+<!-- 9 -->
+<section id="faq">
+  <h2 class="sec"><span class="n">9</span> 자주 묻는 질문</h2>
+
+  <details><summary>Q. 프로그래밍을 몰라도 쓸 수 있나요?</summary>
+    <p>네. Claude에게 한국어로 부탁만 하면 됩니다. 다만 <b>설치 단계(터미널 명령 몇 줄)</b>는 한 번 필요하고, 외부 도구(MCP) 연동은 약간의 설정이 필요합니다. 설치만 도움받으면 그 뒤로는 대화로 충분합니다.</p>
+  </details>
+  <details><summary>Q. "팀이 동시에 일하면 더 빠르지 않나요?"</summary>
+    <p>그게 자연스러운 생각이지만, 현재 Claude Code는 <b>한 번에 한 팀만</b> 활성화됩니다(작업대가 하나). 그래서 이 도구는 순서대로 진행합니다. 대신 그 덕분에 <b>단계 경계가 또렷해져 검사·재실행이 쉬워지는</b> 장점이 있습니다.</p>
+  </details>
+  <details><summary>Q. 중간에 멈추면 처음부터 다시 해야 하나요?</summary>
+    <p>아니요. <b>완료된 단계는 보존</b>되고, 작업 기록을 보고 <b>멈춘 단계부터 이어서</b> 합니다. "이어서 해줘"라고 하면 됩니다.</p>
+  </details>
+  <details><summary>Q. Figma 토큰 같은 비밀번호는 어디에 적나요?</summary>
+    <p><b>설정 파일에 직접 적지 마세요.</b> 반드시 환경 변수(예: <code>${FIGMA_TOKEN}</code>)로 참조하고, 실제 값은 별도 보관합니다. 비밀값이 깃(코드 저장소)에 올라가면 유출됩니다.</p>
+  </details>
+  <details><summary>Q. GitHub·데이터베이스도 연결할 수 있나요?</summary>
+    <p>네, 같은 방식(MCP)으로 연결합니다. 단, <b>읽기만 하는 Figma와 달리 GitHub·DB는 "쓰기·삭제"가 가능</b>하므로 위험합니다. 조사용이라면 <b>읽기 권한만</b> 주고, DB는 <b>읽기 전용 계정</b>을 쓰는 게 정석입니다. <code>DELETE</code>/<code>DROP</code>은 한 줄로 되돌릴 수 없으니까요.</p>
+  </details>
+  <details><summary>Q. 단계는 몇 개가 적당한가요?</summary>
+    <p><b>2~4개</b>가 현실적입니다. 너무 잘게 쪼개면 팀을 만들고 정리하는 비용과 계약 관리가 오히려 부담이 됩니다. 단계 간 차이가 모호하면 합치세요.</p>
+  </details>
+</section>
+
+<!-- 10 -->
+<section id="glossary">
+  <h2 class="sec"><span class="n">10</span> 용어 사전</h2>
+  <table>
+    <tr><th>용어</th><th>쉬운 뜻</th></tr>
+    <tr><td>에이전트 (Agent)</td><td>일하는 AI 한 명 (직원 하나)</td></tr>
+    <tr><td>팀 / 스테이지</td><td>같은 목표의 AI 묶음 = 작업 한 단계 (부서 하나)</td></tr>
+    <tr><td>파이프라인 (Pipeline)</td><td>여러 단계를 순서대로 이은 전체 흐름 (컨베이어 벨트)</td></tr>
+    <tr><td>계약 (Contract)</td><td>팀 사이의 결과물 약속 문서 (주문서)</td></tr>
+    <tr><td>핸드오프 (Handoff)</td><td>결과물을 다음 팀에 넘기는 것 (바통 터치)</td></tr>
+    <tr><td>게이트 (Gate)</td><td>경계에서 계약대로인지 검사하는 관문 (검문소)</td></tr>
+    <tr><td>MCP</td><td>Figma·GitHub 등 외부 도구 연결 통로 (멀티탭 콘센트)</td></tr>
+    <tr><td><code>_workspace</code></td><td>팀들이 결과 파일을 주고받는 공용 폴더 (공용 사물함)</td></tr>
+    <tr><td><code>handoff_log</code></td><td>어디까지 끝냈는지 적는 작업 일지 (출석부)</td></tr>
+    <tr><td>TeamCreate / TeamDelete</td><td>팀을 만들기 / 정리하기 (작업대에 팀을 올리고 내리기)</td></tr>
+  </table>
+</section>
+
+<hr>
+<footer>
+  <p>harness-pipeline v0.1.0 · 비전문가용 쉬운 매뉴얼</p>
+  <p>더 자세한 기술 문서는 플러그인 폴더의 <span class="kbd">SKILL.md</span> 와 <span class="kbd">references/</span> 폴더를 참고하세요.</p>
+</footer>
+
+</div>
+</body>
+</html>

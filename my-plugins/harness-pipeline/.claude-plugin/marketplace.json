@@ -1,8 +1,11 @@
 {
   "name": "harness-pipeline-marketplace",
+  "metadata": {
+    "description": "harness-pipeline 배포용 마켓플레이스 — 다중 팀 파이프라인 메타 스킬."
+  },
   "owner": {
     "name": "jteamjang",
-    "url": "https://github.com/jteamjang/harness-pipeline"
+    "url": "https://github.com/jteamjang87120591-collab/harness-multi-pipline"
   },
   "plugins": [
     {

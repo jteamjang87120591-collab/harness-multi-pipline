@@ -42,9 +42,14 @@ harness-pipeline/
 1. **harness 플러그인 먼저 설치.** harness-pipeline은 각 스테이지를 **harness로 빌드**한다("각 스테이지 = harness 1회 실행"). harness가 없으면 동작하지 않는다.
 2. **에이전트 팀 기능 활성화** — 각 팀원이 셸에서 직접 설정해야 한다:
    ```shell
+   # macOS / Linux (bash·zsh)
    export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
    ```
-   영구 적용은 `~/.zshrc` / `~/.bashrc`에 추가.
+   ```powershell
+   # Windows (PowerShell)
+   $env:CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1"
+   ```
+   영구 적용: macOS/Linux는 `~/.zshrc` / `~/.bashrc`에, Windows는 PowerShell 프로필(`$PROFILE`) 또는 시스템 환경 변수에 추가.
 3. **MCP 연동 시** 해당 MCP 서버를 `.claude/settings.json`에 등록하고 토큰을 환경변수로 둔다(커밋 금지).
 
 > **실험적 의존성 경고:** 이 플러그인은 실험적 기능(Agent Teams) + 다중 팀 + MCP에 의존한다. Claude Code 버전·환경에 따라 동작이 달라질 수 있다. 팀 도입 전 한 명이 먼저 검증할 것을 권한다.
@@ -52,15 +57,22 @@ harness-pipeline/
 ## 설치 (깃 저장소에서)
 
 ```shell
-# 1. 마켓플레이스 추가 (저장소 URL은 실제 값으로 교체)
-claude plugin marketplace add jteamjang/harness-pipeline
+# 1. 마켓플레이스 추가
+claude plugin marketplace add jteamjang87120591-collab/harness-multi-pipline
 # 2. 플러그인 설치
 claude plugin install harness-pipeline@harness-pipeline-marketplace
-# 3. 에이전트 팀 활성화
+# 3. 에이전트 팀 활성화 (macOS/Linux)
 export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+# 3. 에이전트 팀 활성화 (Windows PowerShell)
+$env:CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1"
 ```
 
-로컬에서 먼저 시험하려면: `claude plugin link ./harness-pipeline`
+로컬 폴더에서 먼저 시험하려면(깃 push 전):
+```shell
+claude plugin marketplace add ./harness-pipeline      # 로컬 경로를 마켓플레이스로 등록
+claude plugin install harness-pipeline@harness-pipeline-marketplace
+```
+설치 전 매니페스트 점검: `claude plugin validate ./harness-pipeline`
 
 ## 사용
 
